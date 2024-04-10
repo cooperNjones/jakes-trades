@@ -5,6 +5,9 @@ import plotly.express as px
 
 app = Flask(__name__)
 
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -39,8 +42,16 @@ def generate_plot():
     
     fig.update_traces(hovertext=hover_text, hoverinfo='text')
     plot_html = fig.to_html(full_html=False)
+
+    # Calculate the most popular point
+    counts = df.groupby(['right', 'wrong']).size().reset_index(name='count')
+    most_popular_combination = counts.loc[counts['count'].idxmax()]
+    most_popular_point = {
+        'right': most_popular_combination['right'],
+        'wrong': most_popular_combination['wrong']
+    }
     
-    return render_template('plot.html', plot_html=plot_html)
+    return render_template('plot.html', plot_html=plot_html, most_popular_point=most_popular_point)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
