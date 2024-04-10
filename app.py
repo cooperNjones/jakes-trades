@@ -5,7 +5,7 @@ import plotly.express as px
 
 app = Flask(__name__)
 
-@app.route('/plot')
+@app.route('/')
 def index():
     return render_template('index.html')
 
